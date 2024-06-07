@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status WhatsApp</title>
+    <style>
+        .status-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .status-item {
+            margin: 10px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function refreshPage() {
+            window.location.reload();
+        }
+        setInterval(refreshPage, 30000); // Atualiza a página a cada 30 segundos
+    </script>
+</head>
+<body>
+    <div class="status-container">
+        <?php
+        // Configurações do banco de dados
+        $host = '5.78.108.129';
+        $port = '5432';
+        $dbname = 'flychat';
+        $user = 'Flychat';
+        $password = 'Fly7856490';
+
+        // Conexão com o banco de dados
+        $conn = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
+
+        if (!$conn) {
+            echo "Erro ao conectar ao banco de dados.";
+            exit;
+        }
+
+        // Consulta à tabela Whatsapps
+        $result = pg_query($conn, "SELECT name, status FROM Whatsapps");
+
+        if (!$result) {
+            echo "Erro ao executar a consulta.";
+            exit;
+        }
+
+        // Exibe os resultados
+        while ($row = pg_fetch_assoc($result)) {
+            $name = htmlspecialchars($row['name']);
+            $status = htmlspecialchars($row['status']);
+            $image = $status === 'disconnected' ? 'img/whatsappred.png' : 'img/whatsapp.png';
+            echo "<div class='status-item'>";
+            echo "<p>$name</p>";
+            echo "<img src='$image' alt='$status'>";
+            echo "</div>";
+        }
+
+        // Fecha a conexão com o banco de dados
+        pg_close($conn);
+        ?>
+    </div>
+</body>
+</html>
